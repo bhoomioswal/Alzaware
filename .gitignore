@@ -1,0 +1,37 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights & large binaries (track via releases / external storage instead)
+models/*.h5
+models/*.keras
+models/*.pkl
+models/*.pt
+!models/.gitkeep
+
+# Datasets (never commit raw data)
+datasets/*
+!datasets/dataset_links.md
+
+# Streamlit
+.streamlit/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
