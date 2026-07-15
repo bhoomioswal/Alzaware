@@ -6,7 +6,7 @@ Expected files at runtime:
 
 | File | Produced by | Used by |
 |---|---|---|
-| `mri_model.keras` | `notebooks/MRI_Training.ipynb` | `modules/mri_prediction.py` |
-| `fer_model.keras` | `notebooks/FER_Training.ipynb` | `modules/facial_emotion.py` |
-| `speech_model.pkl` | `notebooks/Speech_Training.ipynb` | `modules/speech_emotion.py` |
+| `mri_model.pkl` | `notebooks/MRI_Training.ipynb` | `modules/mri_prediction.py` |
+| `fer_model.pkl` | `notebooks/FER_Training.ipynb` | `modules/facial_emotion.py` |
+| `ravdess_model.pkl` | `notebooks/RAVDESS_Training.ipynb` | `modules/speech_emotion.py` |
 
