@@ -1,67 +1,71 @@
 """
-Facial Emotion Recognition Module (Prototype)
-================================================
-Uses a CNN trained on FER-2013 (see notebooks/FER_Training.ipynb) plus
-OpenCV's Haar cascade for face detection to classify emotion from an
-uploaded photo.
-
-TODO:
-- Place your trained model at models/fer_model.keras
-- Consider swapping the Haar cascade for a more robust face detector
-  (e.g., MTCNN, MediaPipe) for better accuracy
+Facial expression recognition page.
 """
 
-import cv2
-import numpy as np
 import streamlit as st
+import pandas as pd
+import random
+import time
 from PIL import Image
 
-MODEL_PATH = "models/fer_model.keras"
-EMOTIONS = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
-FACE_CASCADE = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+from modules.common import *
 
 
-@st.cache_resource
-def load_model():
-    import tensorflow as tf
+def render_facial_expression():
+    progress_bar(6)
+    main_col, side_col = st.columns([2.5, 1], gap="large")
+    
+    with main_col:
+        user_banner()
+        st.markdown("""
+        <div class="module-green">
+          <div style="position:absolute;right:-10px;top:-10px;font-size:120px;opacity:0.12;pointer-events:none;">😶</div>
+          <span class="pill-green">MODULE 03 · Neuromuscular Expression Engine</span>
+          <h2 style="color:#14532D; margin-top:8px; margin-bottom:6px; font-size:28px; font-weight:800;">😶 Facial Expression Mapping</h2>
+          <p style="color:#15803D; font-size:14px; margin:0;">Deep computer vision monitoring for tracking micro-expression indicators.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        
+        
+        camera_photo = st.camera_input("Capture Patient Frontal Layout Frame Matrix")
+        if camera_photo:
+            img = Image.open(camera_photo)
+            with st.spinner("Deconstructing micro-muscular layouts..."):
+                label, score, proba_dict = predict_fer(img)
+            if label is None: label, score = "Neutral", 70
+            
+            st.session_state.facial_emotion = label
+            st.session_state.facial_score = score
+            color = FER_COLORS.get(label, "#15803D")
+            st.markdown(f"""
+            <div class="result-box-green" style="border-left-color:{color};">
+              <div style="font-size:11px;font-weight:700;color:#15803D;
+                          text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;background:#DCFCE7;display:inline-block;padding:4px 10px;border-radius:20px;">
+                Detected Expression · Risk Factor</div>
+              <div style="font-size:26px;font-weight:700;color:{color};margin:10px 0 6px;">
+                {label}</div>
+              <div style="font-size:48px;font-weight:800;color:#14532D;">
+                {score}<span style="font-size:18px;font-weight:500;color:#15803D;margin-left:4px;">/ 100</span>
+              </div>
+            </div>""", unsafe_allow_html=True)
 
-    try:
-        return tf.keras.models.load_model(MODEL_PATH)
-    except Exception as e:
-        st.warning(f"Model not found at {MODEL_PATH}. Add your trained model to enable predictions. ({e})")
-        return None
+            if proba_dict:
+                st.markdown("<p style='font-weight:600;color:#1B3A5C;margin-bottom:8px;'>"
+                            "Confidence per emotion:</p>", unsafe_allow_html=True)
+                prob_df = pd.DataFrame({
+                    "Emotion": list(proba_dict.keys()),
+                    "Confidence %": list(proba_dict.values())
+                }).sort_values("Confidence %", ascending=False)
+                st.bar_chart(prob_df.set_index("Emotion"))
+
+            if st.button("Continue to Memory Assessment →"):
+                st.session_state.page = "intro_memory"
+                st.rerun()
+        else:
+            st.info("Please capture a photo with your webcam to proceed.")
+
+# ---------------------------------------------------------------------
+# MODULE 4 — MEMORY TRACKING MODULE
 
 
-def render():
-    st.title("Facial Emotion Recognition (Prototype)")
-
-    uploaded_file = st.file_uploader("Upload a face photo (JPG/PNG)", type=["jpg", "jpeg", "png"])
-
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Uploaded photo", width=300)
-
-        img_arr = np.array(image)
-        gray = cv2.cvtColor(img_arr, cv2.COLOR_RGB2GRAY)
-        detector = cv2.CascadeClassifier(FACE_CASCADE)
-        faces = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
-        if len(faces) == 0:
-            st.error("No face detected. Try a clearer, front-facing photo.")
-            return
-
-        model = load_model()
-        if model is None:
-            st.info("Prediction unavailable — model file not present in this repo.")
-            return
-
-        x, y, w, h = faces[0]
-        face = cv2.resize(gray[y : y + h, x : x + w], (48, 48)) / 255.0
-        face = face.reshape(1, 48, 48, 1)
-
-        preds = model.predict(face)[0]
-        top_idx = int(np.argmax(preds))
-
-        st.subheader("Result")
-        st.write(f"**Detected emotion:** {EMOTIONS[top_idx]}")
-        st.write(f"**Confidence:** {preds[top_idx] * 100:.2f}%")
