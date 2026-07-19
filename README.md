@@ -150,9 +150,8 @@ Individual AI/ML modules were developed and tested independently, then integrate
 
 ## Authors
 
-- Bhoomi — Modern College of Engineering, Pune
-- Co-authors: Utkarsha Raje, Anand Parekh
-- Mentor: Kush Patel (IEEE EMBS Student Internship Program)
+- Bhoomi Oswal,Utkarsha Raje, Anand Parekh-P.E.S Modern College of engineering,Pune
+
 
 ## Disclaimer
 
