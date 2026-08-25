@@ -802,7 +802,7 @@ if st.session_state.page == "home":
                 
     with right_hero_col:
         # Native image presentation without custom layout cards wrapper tags
-        st.image("C:/Users/oswal/Downloads/layout.png", use_container_width=True)
+        st.image("assets/layout.png", use_container_width=True)
    
           
 
