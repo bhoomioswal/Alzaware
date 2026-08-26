@@ -1829,7 +1829,7 @@ elif st.session_state.page == "chatbot":
                     from groq import Groq
                     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
                     res = client.chat.completions.create(
-                        model="llama-3.3-70b-versatile",
+                        model="openai/gpt-oss-120b",
                         messages=[{"role":"system","content":"Clinical Assistant Mode Active."},{"role":"user","content":query}],
                         max_tokens=512
                     )
